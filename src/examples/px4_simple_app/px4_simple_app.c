@@ -59,10 +59,10 @@ int px4_simple_app_main(int argc, char *argv[])
 
 	/* advertise attitude topic */
 	struct vehicle_attitude_s att;
-	memset(&att, 0, sizeof(att));
+	memset(&att, 0, sizeof(att)); // sets all values in att to 0.
 	orb_advert_t att_pub = orb_advertise(ORB_ID(vehicle_attitude), &att);
 
-	/* one could wait for multiple topics with this technique, just using one here */
+	/*one could wait for multiple topics with this technique, just using one here */
 	struct pollfd fds[] = {
 		{ .fd = sensor_sub_fd,   .events = POLLIN },
 		/* there could be more file descriptors here, in the form like:
@@ -72,7 +72,8 @@ int px4_simple_app_main(int argc, char *argv[])
 
 	int error_counter = 0;
 
-	for (int i = 0; i < 5; i++) {
+	//for (int i = 0; i < 5; i++) {
+    while (true) {
 		/* wait for sensor update of 1 file descriptor for 1000 ms (1 second) */
 		int poll_ret = poll(fds, 1, 1000);
 
@@ -108,7 +109,7 @@ int px4_simple_app_main(int argc, char *argv[])
 				att.pitch = raw.accelerometer_m_s2[1];
 				att.yaw = raw.accelerometer_m_s2[2];
 				orb_publish(ORB_ID(vehicle_attitude), att_pub, &att);
-			}
+	  	}
 
 			/* there could be more file descriptors here, in the form like:
 			 * if (fds[1..n].revents & POLLIN) {}

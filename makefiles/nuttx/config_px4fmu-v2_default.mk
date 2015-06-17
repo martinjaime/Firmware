@@ -146,6 +146,7 @@ MODULES		+= examples/rover_steering_control
 # Tutorial code from
 # https://pixhawk.ethz.ch/px4/dev/daemon
 #MODULES		+= examples/px4_daemon_app
+MODULES     += examples/mrtn_px4_daemon_app
 
 # Tutorial code from
 # https://pixhawk.ethz.ch/px4/dev/debug_values
