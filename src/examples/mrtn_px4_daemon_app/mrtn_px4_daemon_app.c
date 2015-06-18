@@ -45,6 +45,8 @@
 
 #include <px4_config.h>
 #include <nuttx/sched.h>
+#include <uORB/uORB.h>
+#include <uORB/topics/distance_sensor.h>
 
 #include <systemlib/systemlib.h>
 #include <systemlib/err.h>
@@ -117,14 +119,43 @@ int mrtn_px4_daemon_app_main(int argc, char *argv[])
 
 int px4_daemon_thread_main(int argc, char *argv[])
 {
+    int llsensor_sub_fd;
+    int poll_ret;
+    int error_count = 0;
+    struct distance_sensor_s raw;
     warnx("[sample daemon] starting\n");
 
     thread_running = true; 
 
+    llsensor_sub_fd = orb_subscribe(ORB_ID(distance_sensor));
+    // orb_set_interval(llsensor_sub_fd, 1000); /* for a second */ 
+
+    /* For waiting for a topic. */ 
+    struct pollfd fd = {.fd = llsensor_sub_fd, .events = POLLIN };
+
     while(!thread_should_exit) {
         warnx("Hello Daemon!!\n");
-        sleep(15);
+        poll_ret = poll(fd, 1, 1000); /* poll for a second */ 
+
+        /* Handling the return of poll() */ 
+        if (poll_ret == 0)  
+            printf("No data from providers within a second\n");
+        else if (poll_ret < 0) {
+            if (error_count < 10 || error_count % 50 == 0) 
+                printf("ERROR returned from poll(): %d\n", poll_ret);
+            error_count++;
+        } else {
+            if (fd.revents & POLLIN) {
+                /* Obtained data! */ 
+                orb_copy(ORB_ID(distance_sensor), llsensor_sub_fd, &raw);
+                printf("[mrtn_px4_daemon_app] distance read: %.3f\n", 
+                        raw.current_distance);
+            }
+        }                      
+
+        sleep(7);
     }
+
     warnx("[sample daemon] exiting.\n");
     thread_running = false;
 
