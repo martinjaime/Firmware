@@ -34,10 +34,10 @@
 /**
  * @file main.c
  *
- * Example implementation of a fixed wing attitude controller. This file is a complete
- * fixed wing controller for manual attitude control or auto waypoint control.
- * There is no need to touch any other system components to extend / modify the
- * complete control architecture.
+ * Example implementation of a fixed wing attitude controller. This file is a
+ * complete fixed wing controller for manual attitude control or auto waypoint
+ * control.  There is no need to touch any other system components to extend /
+ * modify the complete control architecture.
  *
  * @author Lorenz Meier <lm@inf.ethz.ch>
  */
@@ -104,43 +104,50 @@ static void usage(const char *reason);
 /**
  * Control roll and pitch angle.
  *
- * This very simple roll and pitch controller takes the current roll angle
- * of the system and compares it to a reference. Pitch is controlled to zero and yaw remains
- * uncontrolled (tutorial code, not intended for flight).
+ * This very simple roll and pitch controller takes the current roll angle of
+ * the system and compares it to a reference. Pitch is controlled to zero and
+ * yaw remains uncontrolled (tutorial code, not intended for flight).
  *
- * @param att_sp The current attitude setpoint - the values the system would like to reach.
- * @param att The current attitude. The controller should make the attitude match the setpoint
- * @param rates_sp The angular rate setpoint. This is the output of the controller.
+ * @param att_sp The current attitude setpoint - the values the system would
+ * like to reach.  
+ * @param att The current attitude. The controller should make the attitude match 
+ * the setpoint 
+ * @param rates_sp The angular rate setpoint. This is the output of the 
+ * controller.
  */
-void control_attitude(const struct vehicle_attitude_setpoint_s *att_sp, const struct vehicle_attitude_s *att,
-		      struct vehicle_rates_setpoint_s *rates_sp,
-		      struct actuator_controls_s *actuators);
+void control_attitude(const struct vehicle_attitude_setpoint_s *att_sp, 
+                      const struct vehicle_attitude_s *att,
+		              struct vehicle_rates_setpoint_s *rates_sp, 
+                      struct actuator_controls_s *actuators);
 
 /**
  * Control heading.
  *
- * This very simple heading to roll angle controller outputs the desired roll angle based on
- * the current position of the system, the desired position (the setpoint) and the current
- * heading.
+ * This very simple heading to roll angle controller outputs the desired roll
+ * angle based on the current position of the system, the desired position (the
+ * setpoint) and the current heading.
  *
  * @param pos The current position of the system
  * @param sp The current position setpoint
  * @param att The current attitude
  * @param att_sp The attitude setpoint. This is the output of the controller
  */
-void control_heading(const struct vehicle_global_position_s *pos, const struct position_setpoint_s *sp,
-		     const struct vehicle_attitude_s *att, struct vehicle_attitude_setpoint_s *att_sp);
+void control_heading(const struct vehicle_global_position_s *pos, 
+                     const struct position_setpoint_s *sp,
+                     const struct vehicle_attitude_s *att, 
+                     struct vehicle_attitude_setpoint_s *att_sp);
 
-/* Variables */
+/* Global variables */
 static bool thread_should_exit = false;		/**< Daemon exit flag */
 static bool thread_running = false;		/**< Daemon status flag */
 static int deamon_task;				/**< Handle of deamon task / thread */
 static struct params p;
 static struct param_handles ph;
 
-void control_attitude(const struct vehicle_attitude_setpoint_s *att_sp, const struct vehicle_attitude_s *att,
-		      struct vehicle_rates_setpoint_s *rates_sp,
-		      struct actuator_controls_s *actuators)
+void control_attitude(const struct vehicle_attitude_setpoint_s *att_sp, 
+                      const struct vehicle_attitude_s *att,
+                      struct vehicle_rates_setpoint_s *rates_sp,
+                      struct actuator_controls_s *actuators)
 {
 
 	/*
@@ -176,8 +183,10 @@ void control_attitude(const struct vehicle_attitude_setpoint_s *att_sp, const st
 	actuators->control[1] = pitch_err * p.pitch_p;
 }
 
-void control_heading(const struct vehicle_global_position_s *pos, const struct position_setpoint_s *sp,
-		     const struct vehicle_attitude_s *att, struct vehicle_attitude_setpoint_s *att_sp)
+void control_heading(const struct vehicle_global_position_s *pos, 
+                     const struct position_setpoint_s *sp,
+		             const struct vehicle_attitude_s *att, 
+                     struct vehicle_attitude_setpoint_s *att_sp)
 {
 
 	/*
@@ -212,8 +221,11 @@ int fixedwing_control_thread_main(int argc, char *argv[])
 		}
 	}
 
-	/* welcome user (warnx prints a line, including an appended\n, with variable arguments */
-	warnx("[example fixedwing control] started");
+    /* 
+     * Welcome user (warnx prints a line, including an appended\n, with
+     * variable arguments 
+     */
+    warnx("[example fixedwing control] started");
 
 	/* initialize parameters, first the handles, then the values */
 	parameters_init(&ph);
@@ -287,21 +299,24 @@ int fixedwing_control_thread_main(int argc, char *argv[])
 
 	/* Setup of loop */
 
-	struct pollfd fds[2] = {{ .fd = param_sub, .events = POLLIN },
+	struct pollfd fds[2] = {
+        { .fd = param_sub, .events = POLLIN },
 		{ .fd = att_sub, .events = POLLIN }
 	};
 
 	while (!thread_should_exit) {
 
 		/*
-		 * Wait for a sensor or param update, check for exit condition every 500 ms.
-		 * This means that the execution will block here without consuming any resources,
-		 * but will continue to execute the very moment a new attitude measurement or
-		 * a param update is published. So no latency in contrast to the polling
-		 * design pattern (do not confuse the poll() system call with polling).
+         * Wait for a sensor or param update, check for exit condition every
+         * 500 ms.  This means that the execution will block here without
+         * consuming any resources, but will continue to execute the very
+         * moment a new attitude measurement or a param update is published. So
+         * no latency in contrast to the polling design pattern (do not confuse
+         * the poll() system call with polling).
 		 *
-		 * This design pattern makes the controller also agnostic of the attitude
-		 * update speed - it runs as fast as the attitude updates with minimal latency.
+         * This design pattern makes the controller also agnostic of the
+         * attitude update speed - it runs as fast as the attitude updates with
+         * minimal latency.
 		 */
 		int ret = poll(fds, 2, 500);
 
@@ -330,7 +345,8 @@ int fixedwing_control_thread_main(int argc, char *argv[])
 			if (fds[1].revents & POLLIN) {
 
 
-				/* Check if there is a new position measurement or position setpoint */
+				/* Check if there is a new position measurement or position 
+                 * setpoint */
 				bool pos_updated;
 				orb_check(global_pos_sub, &pos_updated);
 				bool global_sp_updated;
@@ -353,7 +369,8 @@ int fixedwing_control_thread_main(int argc, char *argv[])
 					orb_copy(ORB_ID(manual_control_setpoint), manual_sp_sub, &manual_sp);
 				}
 
-				/* check if the throttle was ever more than 50% - go later only to failsafe if yes */
+				/* check if the throttle was ever more than 50% - go later only 
+                 * to failsafe if yes */
 				if (isfinite(manual_sp.z) &&
 				    (manual_sp.z >= 0.6f) &&
 				    (manual_sp.z <= 1.0f)) {
@@ -460,6 +477,3 @@ int ex_fixedwing_control_main(int argc, char *argv[])
 	usage("unrecognized command");
 	exit(1);
 }
-
-
-

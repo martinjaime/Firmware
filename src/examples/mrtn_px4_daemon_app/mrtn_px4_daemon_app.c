@@ -42,6 +42,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <poll.h>
 
 #include <px4_config.h>
 #include <nuttx/sched.h>
@@ -53,6 +54,7 @@
 
 static bool thread_should_exit = false; /* daemon exit flag */ 
 static bool thread_running = false;     /* daemon status flag */ 
+static bool should_poll = false;        /* whether user requests poll */
 static int daemon_task;                 /* handle of daemon task/thread */ 
 
 /* Daemon management function. */ 
@@ -112,6 +114,12 @@ int mrtn_px4_daemon_app_main(int argc, char *argv[])
         return 0;
     }
 
+    if (!strcmp(argv[1], "poll"))
+    {
+        should_poll = true;
+        return 0;
+    }
+
     usage("Unrecognized command\n");
 
     return 1; 
@@ -122,38 +130,51 @@ int px4_daemon_thread_main(int argc, char *argv[])
     int llsensor_sub_fd;
     int poll_ret;
     int error_count = 0;
+    int sleep_time = 8;
     struct distance_sensor_s raw;
     warnx("[sample daemon] starting\n");
 
     thread_running = true; 
 
+    /* Subscribe to distance_sensor topic */ 
     llsensor_sub_fd = orb_subscribe(ORB_ID(distance_sensor));
     // orb_set_interval(llsensor_sub_fd, 1000); /* for a second */ 
 
-    /* For waiting for a topic. */ 
-    struct pollfd fd = {.fd = llsensor_sub_fd, .events = POLLIN };
+    /* Wait for topic. */ 
+    struct pollfd fds[] = {
+        {.fd = llsensor_sub_fd, .events = POLLIN},
+    };
 
     while(!thread_should_exit) {
-        warnx("Hello Daemon!!\n");
-        poll_ret = poll(fd, 1, 1000); /* poll for a second */ 
+        // warnx("Hello Daemon!!\n");
+        if (should_poll)
+        {
+            poll_ret = poll(fds, 1, 1000); /* poll for a second */ 
 
-        /* Handling the return of poll() */ 
-        if (poll_ret == 0)  
-            printf("No data from providers within a second\n");
-        else if (poll_ret < 0) {
-            if (error_count < 10 || error_count % 50 == 0) 
-                printf("ERROR returned from poll(): %d\n", poll_ret);
-            error_count++;
-        } else {
-            if (fd.revents & POLLIN) {
-                /* Obtained data! */ 
-                orb_copy(ORB_ID(distance_sensor), llsensor_sub_fd, &raw);
-                printf("[mrtn_px4_daemon_app] distance read: %.3f\n", 
-                        raw.current_distance);
+            /* Handling the return of poll() */ 
+            if (poll_ret == 0)  
+                printf("No data from providers within a second\n");
+            else if (poll_ret < 0) {
+                if (error_count < 10 || error_count % 50 == 0) 
+                    /* To avoid flooding the console with error messages */ 
+                    printf("ERROR returned from poll(): %d\n", poll_ret);
+                error_count++;
+            } else {
+                if (fds[0].revents & POLLIN) {
+                    /* Obtained data! */ 
+                    orb_copy(ORB_ID(distance_sensor), llsensor_sub_fd, &raw);
+                    printf("[mrtn_px4_daemon_app] Distance read: %.3f\n",
+                            (double)raw.current_distance);
+                }
+                /* 
+                 * More file descriptor checks can be added here
+                 * if (fds[1..n].revents & POLLIN) {}
+                 */
             }
-        }                      
-
-        sleep(7);
+            should_poll = false;
+        }
+        printf("Sleeping for %d seconds\n", sleep_time);
+        sleep(sleep_time);
     }
 
     warnx("[sample daemon] exiting.\n");
@@ -161,4 +182,3 @@ int px4_daemon_thread_main(int argc, char *argv[])
 
     return 0; 
 }
-

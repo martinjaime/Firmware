@@ -44,10 +44,13 @@
  * Auto-start script index.
  *
  * Defines the auto-start script used to bootstrap the system.
+ * 
+ * You could reference Firmware/ROMFS/px4fmu_common/init.d/rc.autostart
  *
  * @group System
  */
-PARAM_DEFINE_INT32(SYS_AUTOSTART, 0);
+/* Set to 1000 for /etc/init.d/1000_rc_fw_easystar.hil By Martin Jaime */ 
+PARAM_DEFINE_INT32(SYS_AUTOSTART, 1000);  /* Originally 0 */ 
 
 /**
  * Automatically configure default values.
@@ -60,7 +63,7 @@ PARAM_DEFINE_INT32(SYS_AUTOSTART, 0);
  * @max 1
  * @group System
  */
-PARAM_DEFINE_INT32(SYS_AUTOCONFIG, 0);
+PARAM_DEFINE_INT32(SYS_AUTOCONFIG, 1); /* Originally 0. Means no autostart. */
 
 /**
 * Set usage of IO board
