@@ -49,8 +49,7 @@
  *
  * @group System
  */
-/* Set to 1000 for /etc/init.d/1000_rc_fw_easystar.hil By Martin Jaime */ 
-PARAM_DEFINE_INT32(SYS_AUTOSTART, 1000);  /* Originally 0 */ 
+PARAM_DEFINE_INT32(SYS_AUTOSTART, 0);
 
 /**
  * Automatically configure default values.
@@ -63,12 +62,13 @@ PARAM_DEFINE_INT32(SYS_AUTOSTART, 1000);  /* Originally 0 */
  * @max 1
  * @group System
  */
-PARAM_DEFINE_INT32(SYS_AUTOCONFIG, 1); /* Originally 0. Means no autostart. */
+PARAM_DEFINE_INT32(SYS_AUTOCONFIG, 0);
 
 /**
 * Set usage of IO board
 *
-* Can be used to use a standard startup script but with a FMU only set-up. Set to 0 to force the FMU only set-up.
+* Can be used to use a standard startup script but with a FMU only set-up. Set
+* to 0 to force the FMU only set-up.
 *
 * @min 0
 * @max 1
@@ -90,10 +90,11 @@ PARAM_DEFINE_INT32(SYS_RESTART_TYPE, 2);
 /**
 * Companion computer interface
 *
-* Configures the baud rate of the companion computer interface.  Set to zero to
-* disable, set to these values to enable (NO OTHER VALUES SUPPORTED!) 921600:
-* enables onboard mode at 921600 baud, 8N1. 57600: enables onboard mode at
-* 57600 baud, 8N1.  157600: enables OSD mode at 57600 baud, 8N1.
+* Configures the baud rate of the companion computer interface.
+* Set to zero to disable, set to these values to enable (NO OTHER VALUES SUPPORTED!)
+* 921600: enables onboard mode at 921600 baud, 8N1. 
+* 57600: enables onboard mode at 57600 baud, 8N1.
+* 157600: enables OSD mode at 57600 baud, 8N1.
 *
 * @min 0
 * @max 921600
