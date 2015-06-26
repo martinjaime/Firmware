@@ -35,7 +35,7 @@
  * @file px4_daemon_app.c
  * daemon application example for PX4 autopilot
  *
- * @author Example User <mail@example.com>
+ * @author Martin Jaime <jaimem5@unlv.nevada.edu>
  */
 
 #include <stdio.h>

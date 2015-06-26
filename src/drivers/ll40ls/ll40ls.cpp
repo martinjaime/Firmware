@@ -146,10 +146,6 @@ void start(const bool use_i2c, const int bus)
 				/* tear down the failing onboard instance */
 				delete g_dev_int;
 				g_dev_int = nullptr;
-                /* By mrtn: TODO: use print statements to check 
-                 * why i2c initialization is failing. start here. 
-                 * Mainly at "goto fail" statements.
-                 */
 
 				if (bus == PX4_I2C_BUS_ONBOARD) {
 					goto fail;
