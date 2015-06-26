@@ -146,7 +146,6 @@ int px4_daemon_thread_main(int argc, char *argv[])
     };
 
     while(!thread_should_exit) {
-        // warnx("Hello Daemon!!\n");
         if (should_poll)
         {
             poll_ret = poll(fds, 1, 1000); /* poll for a second */ 
