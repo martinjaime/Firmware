@@ -87,6 +87,8 @@ int test_servo(int argc, char *argv[])
 		return ERROR;
 	}
 
+    printf("There are %u servo channels\n", servo_count); // by mrtn
+
 	for (unsigned i = 0; i < servo_count; i++) {
 		result = ioctl(fd, PWM_SERVO_GET(i), (unsigned long)&pos);
 

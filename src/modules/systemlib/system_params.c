@@ -49,9 +49,7 @@
  *
  * @group System
  */
-/* mrtn: Set to 1000 for /etc/init.d/1000_rc_fw_easystar.hil By Martin Jaime */ 
-PARAM_DEFINE_INT32(SYS_AUTOSTART, 1000);  /* mrtn: Originally 0 */ 
-
+PARAM_DEFINE_INT32(SYS_AUTOSTART, 0);  
 /**
  * Automatically configure default values.
  *
@@ -99,7 +97,7 @@ PARAM_DEFINE_INT32(SYS_RESTART_TYPE, 2);
 * @max 921600
 * @group System
 */
-PARAM_DEFINE_INT32(SYS_COMPANION, 0); /* by mrtn: originally 0. */ 
+PARAM_DEFINE_INT32(SYS_COMPANION, 0); 
 
 /**
 * Parameter version

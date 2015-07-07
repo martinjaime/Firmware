@@ -63,6 +63,7 @@ MODULES		+= systemcmds/nshterm
 MODULES		+= systemcmds/mtd
 MODULES		+= systemcmds/dumpfile
 MODULES		+= systemcmds/ver
+MODULES     += systemcmds/tests  # Added by mrtn
 
 #
 # General system control
