@@ -150,7 +150,10 @@ MODULES		+= examples/rover_steering_control
 
 # Martin Jaime's daemon with LidarLite reading based on 
 # px4_daemon_app tutorial. 
-MODULES     += examples/mrtn_px4_daemon_app 
+#MODULES     += examples/mrtn_px4_daemon_app 
+
+# Martin Jaime's servo test app to experiment with pwm driver
+MODULES     += examples/mrtn_servo_test
 
 # Tutorial code from
 # https://pixhawk.ethz.ch/px4/dev/debug_values
@@ -158,7 +161,7 @@ MODULES     += examples/mrtn_px4_daemon_app
 
 # Tutorial code from
 # https://pixhawk.ethz.ch/px4/dev/example_fixedwing_control
-MODULES			+= examples/fixedwing_control
+#MODULES			+= examples/fixedwing_control
 
 # Hardware test
 #MODULES			+= examples/hwtest
