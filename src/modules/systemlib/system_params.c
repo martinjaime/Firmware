@@ -100,7 +100,7 @@ PARAM_DEFINE_INT32(SYS_RESTART_TYPE, 2);
 * @max 921600
 * @group System
 */
-PARAM_DEFINE_INT32(SYS_COMPANION, 921600); /* Originally 0 */ 
+PARAM_DEFINE_INT32(SYS_COMPANION, 0);
 
 /**
 * Parameter version
