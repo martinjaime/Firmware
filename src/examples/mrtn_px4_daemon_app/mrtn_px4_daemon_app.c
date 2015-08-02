@@ -67,10 +67,10 @@ int px4_daemon_thread_main(int argc, char *argv[]);
 static void usage(const char *reason)
 {
     if (reason) {
-        warnx("%s\n", reason);
+        warnx("%s", reason);
     }
     
-    warnx("usage: daemon {start|stop|status} [-p <additional params>]\n\n");
+    warnx("usage: daemon {start|stop|status|poll} [-p <additional params>]\n");
 }
 
 int mrtn_px4_daemon_app_main(int argc, char *argv[]) 

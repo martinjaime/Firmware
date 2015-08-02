@@ -39,7 +39,7 @@
  * @author Martin Jaime <jaimem5@unlv.nevada.edu>
  */
 
-//#include <px4_config.h>
+#include <px4_config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,8 +52,8 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 
-#include <nuttx/mtd.h>
-#include <nuttx/fs/nxffs.h>
+//#include <nuttx/mtd.h>
+//#include <nuttx/fs/nxffs.h>
 #include <nuttx/fs/ioctl.h>
 
 #include <arch/board/board.h>
@@ -68,18 +68,23 @@ __EXPORT int	mrtn_servo_test_main(int argc, char *argv[]);
 int mrtn_servo_test_main(int argc, char *argv[])
 {
     const char *dev = PWM_OUTPUT0_DEVICE_PATH;
-    char buffer[10];        // For user input. User should only need 4 bytes. 
-    char c;
+    char *endptr;
+    //char c;               // Input for exiting program. 
     int dev_fd;             // file descriptor for device.
 	unsigned servo_count;
     int ret;                // Hold ret value from ioctl.
-    unsigned pwm_value = 0;
+    unsigned pwm_value;
     unsigned channel = 7;
     unsigned i;             // Loop counter. 
 
+    //if argc < 
+    channel = strtoul(argv[1], &endptr, 0) - 1;
+    pwm_value = argc > 1 ? strtoul(argv[2], &endptr, 0) : 1500;
+    printf("Output to channel %u at %u\n", channel, pwm_value);
+
     dev_fd = open(dev, 0);
     if (dev_fd < 0) 
-        err(1, "Opening %s failed.", dev_fd);
+        err(1, "Opening %s failed.", dev);
 
 	/* get the number of servo channels */
 	ret = ioctl(dev_fd, PWM_SERVO_GET_COUNT, (unsigned long)&servo_count);
@@ -118,46 +123,50 @@ int mrtn_servo_test_main(int argc, char *argv[])
      */
 
     /* Open console to directly grab CTRL-C signal */ 
-    struct pollfd input_fds;
-    input_fds.fd = stdin;
+    struct pollfd input_fds; 
+    input_fds.fd = 0; // stdin  
     input_fds.events = POLLIN;
 
     // warnx("Press CTRL-C to abort.");
     printf("Enter a PWM value within 1k - 2k. Out of range to quit:\n"); 
 
-    while(pwm_value > 1000 && pwm_value < 2000) {
+    //while(pwm_value >= 1000 && pwm_value <= 2000) {
         /* Set PWM value on selected channel */
         ret = ioctl(dev_fd, PWM_SERVO_SET(channel), pwm_value);
         if (ret != OK) {
-            err(1, "PWM_SERVO_SET(%d) command failed.", channel);
+            err(1, "PWM_SERVO_SET(%u) command failed", channel);
         }
 
-        /* Get user to input a pwm value. */ 
-        fgets(buffer, sizeof(buffer), stdin);
-        sscanf(buffer, "%d", &pwm_value);
+        //printf("pwm_value is %u at end of loop.\n", pwm_value);
 
-        ///* Abort on user request */
-        //ret = poll(&input_fds, 1, 0);
+        /* Abort on user request */
+        ret = poll(&input_fds, 1, -1); 
         //if (ret > 0) { 
-        //    read(stdin, &c, sizeof(c));
-        //}c == 0x03 || c == 0x63 || c == 'q' <- condition
-    }
+        //    read(0, &c, sizeof(c));
+        //}//c == 0x03 || c == 0x63 || c == 'q' <- condition
 
+        //usleep(2000);
+        //pwm_value++; // DEBUGGING
+    //}
+
+    printf("pwm_value is %u at exit.\n", pwm_value);
     /* 
      * DISARM AND RESTORE
      */ 
+    sleep(2);
     warnx("User abort");
 
     /* Restore pwm values. */ 
+    printf("Reseting to %u\n", last_spos.values[channel]);
     ret = ioctl(dev_fd, PWM_SERVO_SET(channel), last_spos.values[channel]);
     if (ret != OK) {
-        err(1, "PWM_SERVO_SET(%d) command failed.", channel);
+        err(1, "PWM_SERVO_SET(%d) command failed at restore", channel);
     }
     
     /* disarm, but do not revoke the SET_ARM_OK flag */
     ret = ioctl(dev_fd, PWM_SERVO_DISARM, 0); 
     if (ret != OK) {
-        err(1, "PWM_SERVO_DISARM command failed.");
+        err(1, "PWM_SERVO_DISARM command failed");
     }
     warnx("Outputs disarmed.");
 

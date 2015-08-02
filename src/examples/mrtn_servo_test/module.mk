@@ -32,14 +32,13 @@
 ############################################################################
 
 #
-# pwm test app
+# Build position estimator
 #
 
-MODULE_COMMAND      = mrtn_servo_test
+MODULE_COMMAND		= mrtn_servo_test
 
-SRC                 = mrtn_servo_test.c
+SRCS		= mrtn_servo_test.c
+		  
+MODULE_STACKSIZE = 1800
 
-MODULE_STACKSIZE    = 1800
-
-MAXOPTIMIZATION  = -Os
-
+MAXOPTIMIZATION	 = -Os
