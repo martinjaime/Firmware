@@ -62,7 +62,7 @@ PARAM_DEFINE_INT32(SYS_AUTOSTART, 0);
  * @max 1
  * @group System
  */
-PARAM_DEFINE_INT32(SYS_AUTOCONFIG, 1); /* By mrtn: Originally 0. Means no autostart. */
+PARAM_DEFINE_INT32(SYS_AUTOCONFIG, 0); /* By mrtn: Originally 0. Means no autostart. */
 
 /**
 * Set usage of IO board
@@ -98,7 +98,7 @@ PARAM_DEFINE_INT32(SYS_RESTART_TYPE, 2);
 * @max 921600
 * @group System
 */
-PARAM_DEFINE_INT32(SYS_COMPANION, 0); 
+PARAM_DEFINE_INT32(SYS_COMPANION, 921600); /* By mrtn: originally 0 */ 
 
 /**
 * Parameter version
